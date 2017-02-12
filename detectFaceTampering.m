@@ -22,7 +22,7 @@ function varargout = detectFaceTampering(varargin)
 
 % Edit the above text to modify the response to help detectFaceTampering
 
-% Last Modified by GUIDE v2.5 10-Feb-2017 11:57:44
+% Last Modified by GUIDE v2.5 11-Feb-2017 21:31:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -129,10 +129,10 @@ image2FullPath = evalin('base','imageFullPath2'); %get the file path from base w
 [xCoord1,yCoord1,width1,height1,image1]=faceDetectionArea(image1FullPath);
 [xCoord2,yCoord2,width2,height2,image2]=faceDetectionArea(image2FullPath);
 
-if isEmpty(image1) || isEmpty(image2)
-     msgbox('something had wrong while the face detactiong,please try again','Error message','error');
-    return;
-end
+%if isEmpty(image1) || isEmpty(image2)
+ %    msgbox('something had wrong while the face detactiong,please try again','Error message','error');
+ %   return;
+%end
  
  faceImage1 = imcrop(image1,[xCoord1 yCoord1 width1 height1]);
  axes(handles.axes1);
@@ -177,7 +177,7 @@ numPts = 0;
 frameCount = 0;
 recognizedFrameCount = 0;
 twoConsecutiveFrames=[];
-maxNumOfFrames = 2;
+maxNumOfFrames = 100;
 
 while runLoop && frameCount < maxNumOfFrames
 
@@ -198,6 +198,10 @@ while runLoop && frameCount < maxNumOfFrames
         
         % Detection mode.
         bbox = faceDetector.step(videoFrameGray);
+        hold on
+        eyesDetect = vision.CascadeObjectDetector('EyePairBig');
+        step(eyesDetect,videoFrameGray);
+        
 
         if ~isempty(bbox) % if we recognized a face
             
@@ -227,6 +231,10 @@ while runLoop && frameCount < maxNumOfFrames
 
             % Display a bounding box around the detected face.
             videoFrame = insertShape(videoFrame, 'Polygon', bboxPolygon, 'LineWidth', 3);
+            
+            hold on
+            eyesDetect = vision.CascadeObjectDetector('EyePairBig');
+            step(eyesDetect,videoFrameGray);
 
             % Display detected corners.
             videoFrame = insertMarker(videoFrame, xyPoints, '+', 'Color', 'white');
@@ -273,6 +281,9 @@ while runLoop && frameCount < maxNumOfFrames
             %I always override the past frame to save memory space.  
             
             bboxes = step(faceDetector, videoFrameGray);
+            hold on
+            eyesDetect = vision.CascadeObjectDetector('EyePairBig');
+            step(eyesDetect,videoFrameGray);
             modulo = mod(recognizedFrameCount,2); 
             if modulo ==0
                 twoConsecutiveFrames{1,1}=videoFrameGray;
@@ -297,6 +308,10 @@ while runLoop && frameCount < maxNumOfFrames
 
     % Display the annotated video frame using the video player object.
     step(videoPlayer, videoFrame);
+    hold on
+    EyeDetect = vision.CascadeObjectDetector('EyePairBig');
+    step(EyeDetect,videoFrame);
+    
 
     % Check whether the video player window has been closed.
     runLoop = isOpen(videoPlayer);
@@ -345,3 +360,28 @@ for i=1:rows1
     
 end
 
+
+% --- Executes on button press in detectEyesBtn.
+function detectEyesBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to detectEyesBtn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+image1FullPath = evalin('base','imageFullPath1'); %get the file path from base workspace.
+image2FullPath = evalin('base','imageFullPath2'); %get the file path from base workspace.
+
+[xCoord1,yCoord1,width1,height1,image1]=eyesDetectionArea(image1FullPath);
+[xCoord2,yCoord2,width2,height2,image2]=eyesDetectionArea(image2FullPath);
+
+%if isEmpty(image1) || isEmpty(image2)
+ %    msgbox('something had wrong while the face detactiong,please try again','Error message','error');
+ %   return;
+%end
+ 
+ faceImage1 = imcrop(image1,[xCoord1 yCoord1 width1 height1]);
+ axes(handles.axes1);
+ imshow(faceImage1);
+ 
+ faceImage2 = imcrop(image2,[xCoord2 yCoord2 width2 height2]);
+ axes(handles.axes2);
+ imshow(faceImage2);

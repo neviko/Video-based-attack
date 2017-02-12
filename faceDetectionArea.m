@@ -1,4 +1,4 @@
-function [ xCoord,yCoord,width,height,image ] = faceDetectionArea(imageFullPath)
+function [ xCoord,yCoord,width,height,image] = faceDetectionArea(imageFullPath)
 %UNTITLED3 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,7 +10,7 @@ I = imread(imageFullPath);%Read input image.
  bboxes = step(faceDetector, I);%Detect faces. [x, y, width, height], x and y placed in the up-left corner.
  
 %Annotate detected faces.
- IFaces = insertObjectAnnotation(I, 'rectangle', bboxes, 'Face');
+ IFaces = insertObjectAnnotation(I, 'rectangle', bboxes, 'face');
  imshow(IFaces), title('Detected faces');
  
 
