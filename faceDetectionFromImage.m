@@ -1,6 +1,4 @@
 function [ xCoord,yCoord,width,height,i ] = faceDetectionFromImage(image)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
 
 
 %face recognation
