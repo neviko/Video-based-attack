@@ -60,6 +60,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 setImageBG('C:\V-B-A-Github\Images\GUI Backgruonds\lp.jpg');
 set(gcf,'units','normalized','outerposition',[0 0 1 1]) % maximize current figure
+cd 'C:\V-B-A-Github';
 
 % UIWAIT makes LandingPage wait for user response (see UIRESUME)
 % uiwait(handles.figure1);

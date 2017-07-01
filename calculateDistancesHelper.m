@@ -11,7 +11,7 @@ if(drawLine)
       pause(0.35); 
     end
     %draw the line in the image
-    plot([pointsMatrix(point1,1) pointsMatrix(point2,1)],[pointsMatrix(point1,2) pointsMatrix(point2,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(point1,1) pointsMatrix(point2,1)],[pointsMatrix(point1,2) pointsMatrix(point2,2)],'Color','w','LineWidth',1)
 end
 
 

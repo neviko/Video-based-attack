@@ -103,7 +103,7 @@ numPts = 0;
 frameCount = 0;
 recognizedFrameCount = 0;
 twoConsecutiveFrames=[];
-maxNumOfFrames = 60;
+maxNumOfFrames = 20;
 
 while runLoop && frameCount < maxNumOfFrames
 
@@ -307,7 +307,12 @@ function loadVideoBtn_Callback(hObject, eventdata, handles)
         if isempty(boxes)          
             drawnow;
             continue;
-        end    
+        end
+        
+        if(size(boxes,2)>1)
+            boxes = getMostDominanteFace(boxes);
+        end
+        
         % First attempt to use the Matlab one (fastest but not as accurate, if not present use yu et al.)   
         det_shapes = [];
         if(~isempty(boxes))
@@ -350,8 +355,7 @@ function loadVideoBtn_Callback(hObject, eventdata, handles)
             shape = shape + 1;
             try    
                 hold on;                  
-                plot(shape(:,1), shape(:,2),'.m','MarkerSize',5);
-                plot(shape(:,1), shape(:,2),'+g','MarkerSize',3);   
+                plot(shape(:,1), shape(:,2),'+m','MarkerSize',3);   
                 drawnow expose;
                 hold off;
             catch warn
@@ -362,7 +366,7 @@ function loadVideoBtn_Callback(hObject, eventdata, handles)
 
 
     delete(vr);
-    delete(gca)
+    delete(gca);
     %cla(handles.vidAxis,'reset'); % clear the current image from the axis
     %set(handles.vidAxis,'visible', 'off');
     cd(lastDir);    

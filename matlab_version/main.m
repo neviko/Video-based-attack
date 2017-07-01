@@ -13,11 +13,11 @@ clmParams.multi_modal_types  = patches(1).multi_modal_types;
 load('face_validation/trained/face_check_cnn_68.mat', 'face_check_cnns');
 addpath('face_validation');
 addpath('mexopencv-master');
-mexopencv.make
+%mexopencv.make
 cam = cv.VideoCapture(0);
 
 frameCounter=0;
-maxNumOfFrames = 50;
+maxNumOfFrames = 80;
 
 detector = cv.CascadeClassifier('haarcascade_frontalface_alt.xml');
 while true && frameCounter < maxNumOfFrames
@@ -76,7 +76,7 @@ while true && frameCounter < maxNumOfFrames
         try                   
             axis equal;
             hold on;                    
-            plot(shape(:,1), shape(:,2),'.r','MarkerSize',10);
+            %plot(shape(:,1), shape(:,2),'.r','MarkerSize',10);
             plot(shape(:,1), shape(:,2),'.b','MarkerSize',5);                    
             hold off;
             drawnow expose;

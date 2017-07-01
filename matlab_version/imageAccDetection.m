@@ -20,6 +20,13 @@ load('face_validation/trained/face_check_cnn_68.mat', 'face_check_cnns');
 % First attempt to use the Matlab one (fastest but not as accurate, if not present use yu et al.)
 [bboxs, det_shapes] = detect_faces_(image_orig, {'cascade', 'yu'});
 
+if isempty(bboxs)          
+    msgbox('No face has been recognized','Error message','error');    
+                    
+elseif size(bboxs,2) >1
+    bboxs = getMostDominanteFace(bboxs);
+end   
+
 if(size(image_orig,3) == 3)
     image = rgb2gray(image_orig);
 end              

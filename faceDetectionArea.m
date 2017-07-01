@@ -16,7 +16,7 @@ I = image;%Read input image.
 
  
  if isempty(bboxes)
-    warndlg('The system are not detected any person in the image');
+    warndlg('The system did not recognize any person in the image');
     xCoord= 0;
     yCoord=0;
     width = 0;

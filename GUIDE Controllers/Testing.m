@@ -92,13 +92,15 @@ set(handles.axes1,'visible', 'off');
 set(handles.axes2,'visible', 'off');
 set(handles.axes4,'visible', 'off');
 
+spatioGraph = [];
+
 
 %clear Table data
 t= uitable(handles.uitable1);
 t.Data = [];
 
 %load image 1
-imageFullPath1 = 'C:\V-B-A-Github\Images\consecutive images\n1.jpg';
+imageFullPath1 = 'C:\V-B-A-Github\Images\consecutive images 2\3.jpg';
 image1 = imread(imageFullPath1);
 if(isempty(imageFullPath1))
     return;
@@ -107,7 +109,7 @@ axes(handles.axes1);
 imshow(image1);
 
 %load image 2
-imageFullPath2 = 'C:\V-B-A-Github\Images\consecutive images\n2.jpg';
+imageFullPath2 = 'C:\V-B-A-Github\Images\consecutive images 2\4.jpg';
 if(isempty(imageFullPath2))
     return;
 end
@@ -128,22 +130,35 @@ hold on;
 disMatrixR = calculateDistances( pointMatrixRight,[],false);
 
 
-[isChanged,diffSpatioMatrix] = isPersonChanged( disMatrixL,disMatrixR,0.07 );
+[isChanged,diffSpatioMatrix] = isPersonChanged( disMatrixL,disMatrixR,0.1 );
+spatioGraph(:,end+1) = cell2mat(diffSpatioMatrix(:,6)); %add spatio column to the matrix
+
 
 if(isempty(diffSpatioMatrix))%error message and exit
 end
 
-if(isChanged ==false)%error message and exit
-end
+%show differences
+axes(handles.axes4);
+diffImage = imabsdiff(image1,image2);
+imshow(diffImage);
 
+%dispaly table
 set(handles.uitable1,'visible', 'on');
 t= uitable(handles.uitable1);
 t.Data = diffSpatioMatrix;
 t.ColumnName = {'Name','Distance-L','Distance-R','Hash-L','Hash-R','Ratio','Is Big Change'};
 
-axes(handles.axes4);
-diffImage = imabsdiff(image1,image2);
-imshow(diffImage);
+
+%display ratios graph
+figure;
+hold on
+for ii = 1:size(spatioGraph,2)
+ plot(spatioGraph(:,ii))
+end
+
+if(isChanged == true)%error message and exit
+    msgbox({'Tampering detected!';'The distances ratio between the last two frames was very high'},'Error message','error');
+end
 
 % --- Executes on button press in loadNonConsFrames.
 function loadNonConsFrames_Callback(hObject, eventdata, handles)
@@ -160,12 +175,14 @@ set(handles.axes1,'visible', 'off');
 set(handles.axes2,'visible', 'off');
 set(handles.axes4,'visible', 'off');
 
+spatioGraph = [];
+
 %clear Table data
 t= uitable(handles.uitable1);
 t.Data = [];
 
 %load image 1
-imageFullPath1 = 'C:\V-B-A-Github\Images\consecutive images\n6.jpg';
+imageFullPath1 = 'C:\V-B-A-Github\Images\consecutive images 2\1.jpg';
 image1 = imread(imageFullPath1);
 if(isempty(imageFullPath1))
     return;
@@ -174,7 +191,7 @@ axes(handles.axes1);
 imshow(image1);
 
 %load image 2
-imageFullPath2 = 'C:\V-B-A-Github\Images\consecutive images\n1.jpg';
+imageFullPath2 = 'C:\V-B-A-Github\Images\consecutive images 2\5.jpg';
 if(isempty(imageFullPath2))
     return;
 end
@@ -194,27 +211,32 @@ axes(handles.axes2);
 hold on;
 disMatrixR = calculateDistances( pointMatrixRight,[],false);
 
+%check if the person has been changed
+[isChanged,diffSpatioMatrix] = isPersonChanged( disMatrixL,disMatrixR,0.1 );
+spatioGraph(:,end+1) = cell2mat(diffSpatioMatrix(:,6));
 
-[isChanged,diffSpatioMatrix] = isPersonChanged( disMatrixL,disMatrixR,0.07 );
+%display didderences image
+axes(handles.axes4);
+diffImage = imabsdiff(image1,image2);
+imshow(diffImage);
 
-if(isempty(diffSpatioMatrix))%error message and exit
-end
-
-if(isChanged ==true)%error message and exit
-    msgbox('Tampering detected!\nThe distances ratio between the last two frames was very high','Error message','error');
-end
-
+%make the table to be visible and insert data
 set(handles.uitable1,'visible', 'on');
 t= uitable(handles.uitable1);
 t.Data = diffSpatioMatrix;
 t.ColumnName = {'Name','Distance-L','Distance-R','Hash-L','Hash-R','Ratio','Is Big Change'};
 
+%display ratios graph
+figure;
+hold on
+for ii = 1:size(spatioGraph,2)
+ plot(spatioGraph(:,ii))
+end
 
-axes(handles.axes4);
-diffImage = imabsdiff(image1,image2);
-imshow(diffImage);
 
-
+if(isChanged ==true)%error message and exit
+    msgbox({'Tampering detected!';'The distances ratio between the last two frames was very high'},'Error message','error');
+end
 
 
 function videoBtn_Callback(hObject, eventdata, handles)
@@ -249,14 +271,14 @@ addpath('face_detection');
 clmParams.multi_modal_types  = patches(1).multi_modal_types;
 % load the face validator and add its dependency
 load('face_validation/trained/face_check_cnn_68.mat', 'face_check_cnns');
-[file, path] = uigetfile({'*.avi';'*.mpg'},'Select video file');
+[file, path] = uigetfile({'*.avi';'*.mpg';'*.mp4'},'Select video file');
 if (isequal(file,0) || isequal(file,0))
 
     cd(lastDir); %come back to the last direction
     return;
 end
  vr = VideoReader(fullfile(path, file));
- vr.CurrentTime = 2.5; 
+ vr.CurrentTime = 2.5;
  currAxes = axes; % create an axes
  currAxes.Position=[0.04 0.0005 0.80 0.7150]; % axes position
  addpath('mexopencv-master\')
@@ -267,13 +289,20 @@ end
  lastFrame=[];
  currFrame = [];
  videoMatrix={};
+ spatioGraph = [];
+
  maxNumOfFrames =70;
  isPerChangedCounter=0;
-
  
- while hasFrame(vr) && frameNumber< maxNumOfFrames %while the video is running
+ 
+ while hasFrame(vr) && frameNumber < maxNumOfFrames %while the video is running
+    
+    %if(vr.CurrentTime == vr.Duration)
+     %   break;
+    %end
     
     frameNumber = frameNumber+1; %increment the frame number
+    
     
     frame = readFrame(vr); % read frame
     image(frame, 'Parent', currAxes); %display the image on axes
@@ -285,12 +314,17 @@ end
     if isempty(boxes)          
         drawnow;
         continue;
-    end    
+                    
+    elseif size(boxes,2) >1
+        boxes = getMostDominanteFace(boxes);
+    end        
+    
     % First attempt to use the Matlab one (fastest but not as accurate, if not present use yu et al.)   
     det_shapes = [];
     
     
     if(~isempty(boxes))
+           
         boxes = cell2mat(boxes');
         % Convert to the right format
         bboxs = boxes';                
@@ -313,11 +347,14 @@ end
     
     end
     
-    
+    %%%%%%%%%%create a function that find the must dominante face
     
     for i=1:size(bboxs,2)
         % Convert from the initial detected shape to CLM model parameters,
         % if shape is available
+        
+        
+        
         bbox = bboxs(:,i);
         num_points = numel(pdm.M) / 3;
         M = reshape(pdm.M, num_points, 3);
@@ -365,18 +402,21 @@ end
         
         try    
             hold on;
-            if(frameNumber==1)
+            if(frameNumber==1)%first frame in a row
                 lastFrame= shape;
                 disMatrixLast = calculateDistances( lastFrame,[],false);
             else
                 currFrame= shape;
                 disMatrixCurr = calculateDistances( currFrame,[],false);
-                [isChanged,diffSpatioArr] = isPersonChanged( disMatrixLast,disMatrixCurr,0.6);
+                [isChanged,diffSpatioArr] = isPersonChanged( disMatrixLast,disMatrixCurr,0.1);
+                spatioGraph(:,end+1) = cell2mat(diffSpatioArr(:,6));
                 
                 if(isChanged==true)
                     isPerChangedCounter = isPerChangedCounter+1;
-                    if(isPerChangedCounter >= floor(size(disMatrixLast,1) * 1))
+                    frameNumber = 0; % start the comperation from the beggining
+                    if(isPerChangedCounter >= sqrt(vr.Duration))                            
                             msgbox('Tampering detected!\n The distances ratio between the last two frames was very high','Error message','error');
+                            vr.CurrentTime = vr.Duration; %run video to the end
                             break;
                     end
                     
@@ -384,8 +424,8 @@ end
                 if(isempty(videoMatrix))
                     videoMatrix(:,end+1) = diffSpatioArr(:,1); % copy dis names
                 end
-                videoMatrix(:,end+1) = diffSpatioArr(:,2); %copy distances
-                videoMatrix(:,end+1) = diffSpatioArr(:,3); %copy distances
+                %videoMatrix(:,end+1) = diffSpatioArr(:,2); %copy distances
+                videoMatrix(:,end+1) = diffSpatioArr(:,3); %copy distances 
                 
                 
             end
@@ -394,11 +434,18 @@ end
             
         catch warn
             fprintf('%s', warn.message);
+            pause(1);
+            %delete(gca);
+            msgbox('Tampering detected! The distances ratio between the last two frames was extreamly high','Error message','error');
+            pause(0.5);
+            vr.CurrentTime = vr.Duration; %run video to the end
+
         end
         
         if(frameNumber > 1)
-            lastFrame=currFrame;
-            currFrame=[];
+            lastFrame=currFrame; %copy positions
+            currFrame=[]; %clear current frame
+            disMatrixLast = disMatrixCurr; %copy the current distances matrix to the last distances matrix
         end
         
         
@@ -407,19 +454,265 @@ end
     end    
  end
  
+ 
+ 
+ %display ratios graph
+ %delete(gca);
+ 
+figure;
+hold on
+for ii = 1:size(spatioGraph,2)
+ plot(spatioGraph(:,ii))
+end
+ 
+ 
+ f = figure;
+ t = uitable;
+ t.Units='normalized';
+ t.Position =[0 0 1 1];
+ t.FontSize = 15;
+ t.Data = videoMatrix; %insert data to the table
+ 
+ 
+ 
+ delete(vr); %delete video reader pointer
+
+ cd(lastDir); %come back to the last direction
+ 
+
+ 
+ 
+ 
+ 
+ function rtVideoBtn_Callback(hObject, eventdata, handles)
+cla(handles.axes1,'reset'); % clear the current image from the axis
+cla(handles.axes2,'reset'); % clear the current image from the axis
+cla(handles.axes4,'reset'); % clear the current image from the axis
+cla(handles.uitable1,'reset'); % clear the current image from the axis
+
+set(handles.axes1,'visible', 'off');
+set(handles.axes2,'visible', 'off');
+set(handles.uitable1,'visible', 'off');
+set(handles.axes4,'visible', 'off');
+     
+lastDir = pwd;
+newDir = strcat(pwd,'\matlab_version');
+cd (newDir); %set new direction     
+     
+clc
+addpath('PDM_helpers');
+addpath('fitting');
+addpath('models');
+addpath('face_detection');
+
+%% loading the patch experts
+[clmParams, pdm] = Load_CLM_params_vid();
+[patches] = Load_Patch_Experts( 'models/general/', 'svr_patches_*_general.mat', [], [], clmParams);
+clmParams.multi_modal_types  = patches(1).multi_modal_types;
+% load the face validator and add its dependency
+load('face_validation/trained/face_check_cnn_68.mat', 'face_check_cnns');
+addpath('face_validation');
+addpath('mexopencv-master');
+
+currAxes = axes; % create an axes
+currAxes.Position=[0.04 0.0005 0.80 0.7150]; %set the axes position
+currAxes.Visible = 'off';    
+
+%mexopencv.make
+cam = cv.VideoCapture(0);
+
+frameNumber=0;
+lastFrame=[];
+currFrame = [];
+videoMatrix={};
+isPerChangedCounter=0; %how many times the system didn't recognized face
+maxNumOfFrames = 10;
+frameMainCounter =0;
+spatioGraph = [];
+
+
+detector = cv.CascadeClassifier('haarcascade_frontalface_alt.xml');
+while true && frameMainCounter < maxNumOfFrames
+    % if this version throws a "Dot name reference on non-scalar structure"
+    % error change obj.NumberOfFrames to obj(1).NumberOfFrames (in two
+    % places in read function) or surround it with an empty try catch
+    % statement
+    frameMainCounter = frameMainCounter+1;
+
+    frameNumber = frameNumber+1;
+    
+    image_orig = cam.read;  
+    imshow(image_orig);
+    im = cv.cvtColor(image_orig, 'RGB2GRAY');
+    im = cv.equalizeHist(im);
+    boxes = detector.detect(im, 'ScaleFactor',1.3,'MinNeighbors',2, 'MinSize', [30,30]);
+    % First attempt to use the Matlab one (fastest but not as accurate, if not present use yu et al.)
+    tic;
+    [bboxs, det_shapes] = detect_faces(detector,im, {'cascade', 'yu'}); 
+    
+    if(isempty(bboxs))
+        %frameNumber=1
+        continue;
+        
+    elseif(size(bboxs) > 1)
+        bboxs = getMostDominanteFace(bboxs);
+    end
+    
+    
+    for i=1:size(bboxs,2)
+        % Convert from the initial detected shape to CLM model parameters,
+        % if shape is available
+        bbox = bboxs(:,i);
+        if(~isempty(det_shapes))
+            shape = det_shapes(:,:,i);
+            inds = [1:60,62:64,66:68];
+            M = pdm.M([inds, inds+68, inds+68*2]);
+            E = pdm.E;
+            V = pdm.V([inds, inds+68, inds+68*2],:);
+            [ a, R, T, ~, params, err, shapeOrtho] = fit_PDM_ortho_proj_to_2D(M, E, V, shape);
+            g_param = [a; Rot2Euler(R)'; T];
+            l_param = params;
+            % Use the initial global and local params for clm fitting in the image
+            [shape,~,~,lhood,lmark_lhood,view_used] = Fitting_from_bb(im, [], bbox, pdm, patches, clmParams, 'gparam', g_param, 'lparam', l_param);
+        else
+            num_points = numel(pdm.M) / 3;
+            M = reshape(pdm.M, num_points, 3);
+            width_model = max(M(:,1)) - min(M(:,1));
+            height_model = max(M(:,2)) - min(M(:,2));
+            a = (((bbox(3) - bbox(1)) / width_model) + ((bbox(4) - bbox(2))/ height_model)) / 2;
+            tx = (bbox(3) + bbox(1))/2;
+            ty = (bbox(4) + bbox(2))/2;
+            % correct it so that the bounding box is just around the minimum
+            % and maximum point in the initialised face
+            tx = tx - a*(min(M(:,1)) + max(M(:,1)))/2;
+            ty = ty + a*(min(M(:,2)) + max(M(:,2)))/2;
+            % visualisation
+            g_param = [a, 0, 0, 0, tx, ty]';
+            l_param = zeros(size(pdm.E));
+            [shape,~,~,lhood,lmark_lhood,view_used] = Fitting_from_bb(im, [], bbox, pdm, patches, clmParams, 'gparam', g_param, 'lparam', l_param);
+        end
+        
+        
+        %adding 6 more points on the user cheeks
+   
+        %low cheek right
+        shape(69,1) =shape(37,1);
+        shape(69,2) =shape(31,2);
+        
+        %low cheek left
+        shape(70,1) = shape(46,1);
+        shape(70,2) = shape(31,2);
+        
+        %up cheek right
+        shape(71,1) =shape(41,1);
+        shape(71,2) =shape(30,2);
+        
+        %up cheek left
+        shape(72,1) = shape(48,1);
+        shape(72,2) = shape(30,2);
+        
+        %right cheek-mouth points
+        shape(73,1) = shape(42,1);
+        shape(73,2) = shape(52,2);
+        
+        %left cheek-mouth points
+        shape(74,1) = shape(47,1);
+        shape(74,2) = shape(52,2);
+        
+        
+        
+        
+        % shape correction for matlab format
+        shape = shape + 1;      
+        
+        try                   
+            axis equal;
+            hold on;                    
+            
+            if(frameNumber==1)%first frame in a row
+                lastFrame= shape;
+                disMatrixLast = calculateDistances( lastFrame,[],false);
+            else
+                currFrame= shape;
+                disMatrixCurr = calculateDistances( currFrame,[],false);
+                [isChanged,diffSpatioArr] = isPersonChanged(disMatrixLast,disMatrixCurr,0.5);
+                
+                spatioGraph(:,end+1) = cell2mat(diffSpatioArr(:,6));
+                
+                
+                if(isChanged==true)
+                    isPerChangedCounter = isPerChangedCounter+1;
+                    frameNumber = 0; % start the comperation from the beggining
+                    if(isPerChangedCounter >= sqrt(frameMainCounter))
+                            delete(cam); %delete video reader pointer
+                            delete(gca);% delete the axes
+                            cd(lastDir); %come back to the last direction
+                            msgbox('Tampering detected!\n The distances ratio between the last two frames was very high','Error message','error');
+                            frameMainCounter = maxNumOfFrames;
+                            break;
+                    end
+                    
+                end
+                
+                
+                
+                if(isempty(videoMatrix))
+                    videoMatrix(:,end+1) = diffSpatioArr(:,1); % copy dis names
+                end
+                %videoMatrix(:,end+1) = diffSpatioArr(:,2); %copy distances
+                videoMatrix(:,end+1) = diffSpatioArr(:,3); %copy distances 
+                
+                
+            end
+            
+            plot(shape(:,1), shape(:,2),'.b','MarkerSize',5);                    
+            hold off;
+            drawnow expose;
+        
+        catch warn
+            fprintf('%s', warn.message);
+            delete(cam); %delete video reader pointer
+            delete(gca);% delete the axes
+            delete(gca);
+            delete(gca);
+            msgbox('Tampering detected! The distances ratio between the last two frames was extreamly high','Error message','error');
+            frameMainCounter = maxNumOfFrames;
+            
+        end
+        
+        if(frameNumber > 1)
+            if(isempty(lastFrame))
+                frameNumber=0;
+            end
+            lastFrame=currFrame; %copy positions
+            currFrame=[]; %clear current frame
+            disMatrixLast = disMatrixCurr; %copy the current distances matrix to the last distances matrix
+        end
+        
+        
+    end 
+    a = toc;
+    disp(num2str(a));
+end
+
+%delete(cam); %delete video reader pointer
+%delete(gca);% delete the axes
+
+%display ratios graph
+figure;
+hold on
+for ii = 1:size(spatioGraph,2)
+ plot(spatioGraph(:,ii))
+end
+
 f = figure;
 t = uitable;
 t.Units='normalized';
 t.Position =[0 0 1 1];
 t.FontSize = 15;
 t.Data = videoMatrix; %insert data to the table
- 
- delete(vr); %delete video reader pointer
- delete(gca);% delete the axes
- cd(lastDir); %come back to the last direction
- 
- 
- 
 
-
-
+cd(lastDir); %come back to the last direction
+     
+     
+     

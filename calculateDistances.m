@@ -276,7 +276,7 @@ distancesMatrix{end,2} = L_eyeBrow_to_L_ear;
 %draw the face shape
 for i=1:16
     hold on
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
@@ -285,7 +285,7 @@ end
 %draw the right eye brow
 for i=18:21
     hold on
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
@@ -294,7 +294,7 @@ end
 %draw the left eye brow
 for i=23:26
     hold on
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
@@ -302,48 +302,48 @@ end
 
 %draw right eye
 for i=37:41
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
 end
-plot([pointsMatrix(37,1) pointsMatrix(42,1)],[pointsMatrix(37,2) pointsMatrix(42,2)],'Color','w','LineWidth',2)
+plot([pointsMatrix(37,1) pointsMatrix(42,1)],[pointsMatrix(37,2) pointsMatrix(42,2)],'Color','w','LineWidth',1)
 
 if(isDeley)
         pause(deleyInSec);
 end
 %draw left eye
 for i=43:47
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
 end
 
-plot([pointsMatrix(43,1) pointsMatrix(48,1)],[pointsMatrix(43,2) pointsMatrix(48,2)],'Color','w','LineWidth',2)
+plot([pointsMatrix(43,1) pointsMatrix(48,1)],[pointsMatrix(43,2) pointsMatrix(48,2)],'Color','w','LineWidth',1)
 
 if(isDeley)
         pause(deleyInSec);
 end
 %draw outside lips
 for i=49:59
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
 end
-plot([pointsMatrix(49,1) pointsMatrix(60,1)],[pointsMatrix(49,2) pointsMatrix(60,2)],'Color','w','LineWidth',2)
+plot([pointsMatrix(49,1) pointsMatrix(60,1)],[pointsMatrix(49,2) pointsMatrix(60,2)],'Color','w','LineWidth',1)
 if(isDeley)
         pause(deleyInSec);
 end
 %draw inside lips
 for i=61:67
-    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',2)
+    plot([pointsMatrix(i,1) pointsMatrix(i+1,1)],[pointsMatrix(i,2) pointsMatrix(i+1,2)],'Color','w','LineWidth',1)
     if(isDeley)
         pause(deleyInSec);
     end
 end
-plot([pointsMatrix(61,1) pointsMatrix(68,1)],[pointsMatrix(61,2) pointsMatrix(68,2)],'Color','w','LineWidth',2)
+plot([pointsMatrix(61,1) pointsMatrix(68,1)],[pointsMatrix(61,2) pointsMatrix(68,2)],'Color','w','LineWidth',1)
 
 end
 

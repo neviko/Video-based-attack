@@ -427,7 +427,7 @@ if(~isempty(image1) && (x==1 || x==3 || x==0))
     [shape,v_points] = imageAccDetection(image1);
      %cla(handles.axes1IP,'reset');
      axes(handles.axes1IP);
-     plot(shape(v_points,1), shape(v_points',2),'.r','MarkerSize',10);
+     plot(shape(v_points,1), shape(v_points',2),'.r','MarkerSize',8);
      %imshow(editedImage);
 
 
@@ -438,7 +438,7 @@ if(~isempty(image2) && (x==2 || x==3 || x==0))
     axes(handles.axes2IP); 
     [shape,v_points] = imageAccDetection(image2);
      axes(handles.axes2IP);
-     plot(shape(v_points,1), shape(v_points',2),'.r','MarkerSize',10);
+     plot(shape(v_points,1), shape(v_points',2),'.r','MarkerSize',8);
     
 end
 
@@ -485,26 +485,22 @@ if(~isempty(image1) && (x==1 || x==3 || x==0))
     [pointsMatrix,v_points] = imageAccDetection(image1);
      %cla(handles.axes1IP,'reset');
      axes(handles.axes1IP);
-     %[newImage]=drawFaceFeatures(pointsMatrix,image1);
      disMatrix = calculateDistances(pointsMatrix,[],false);
-     %plot(shape(v_points,1), shape(v_points',2),'.r','MarkerSize',10);
-     %imshow(editedImage);
     
     % Construct a questdlg with three options
     choice = questdlg('Dear user, do you want to watch the distances plot of the left image?', ...
         'Choose image', ...
         'Yes','No','No thank you');
+    
     % Handle response
     switch choice
         case 'Yes'                     
             set(handles.uitable2,'visible', 'on');
             t= uitable(handles.uitable2);
             t.Data = disMatrix;
-            t.ColumnName = {'Name','Distance-L'};
-            
+            t.ColumnName = {'Name','Distance-L'};           
         case 'No'
-            
-        
+                   
     end
 
 end
@@ -576,6 +572,20 @@ function revertBtn_Callback(hObject, eventdata, handles)
       imshow(rightImage);
   end
     
+
+function gridDemoBtn_Callback(hObject, eventdata, handles)
+
+figure;
+imagePath = 'C:\V-B-A-Github\Images\girl.jpg';
+if(isempty(imagePath))
+    return;
+end
+image = imread(imagePath);
+imshow(image);
+[pointsMatrix,v_points] = imageAccDetection(image);    
+disMatrix = calculateDistances(pointsMatrix,[],true);
+
+
 
 
 
